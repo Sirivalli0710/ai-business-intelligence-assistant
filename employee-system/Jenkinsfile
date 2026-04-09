@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'file:///home/user/employee-system'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'javac -d build src/EmployeeApp.java'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                sh 'jar cvf employee.jar -C build .'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'mkdir -p employee-app'
+                sh 'cp employee.jar employee-app/'
+            }
+        }
+
+        stage('Run') {
+            steps {
+                sh 'java -cp employee.jar EmployeeApp'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Employee Application Build and Deployment Successful"
+            archiveArtifacts artifacts: 'employee.jar'
+        }
+    }
+}
