@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Business Intelligence Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      margin: 0;
+      color: #172033;
+    }
+    header {
+      background: #142d4e;
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+    main {
+      max-width: 750px;
+      margin: 35px auto;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px #0001;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 12px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      background: #2463eb;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+    #answer { line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AI Business Intelligence Assistant</h1>
+    <p>Ask questions about your sales data</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Ask a Question</h2>
+      <textarea id="question"
+        placeholder="Which category has the highest sales?"></textarea>
+      <br>
+      <button onclick="askQuestion()">Ask Assistant</button>
+    </section>
+
+    <section class="card">
+      <h2>AI Answer</h2>
+      <p id="status">Your answer will appear here.</p>
+      <div id="answer"></div>
+    </section>
+  </main>
+
+  <script>
+    async function askQuestion() {
+      const question = document.getElementById("question").value.trim();
+      const status = document.getElementById("status");
+      const answer = document.getElementById("answer");
+
+      if (!question) {
+        status.textContent = "Please enter a question.";
+        return;
+      }
+
+      status.textContent = "Thinking...";
+      answer.textContent = "";
+
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/ask?question=" +
+          encodeURIComponent(question)
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+          throw new Error(data.error || "Request failed");
+        }
+
+        status.textContent = "Answer:";
+        answer.textContent = data.answer;
+      } catch (error) {
+        status.textContent = "Could not get an answer.";
+        answer.textContent = error.message;
+      }
+    }
+  </script>
+</body>
+</html>
